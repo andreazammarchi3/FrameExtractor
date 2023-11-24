@@ -2,6 +2,7 @@ import cv2
 import tkinter as tk
 from tkinter import filedialog
 import random
+import os
 
 
 def select_file():
@@ -23,6 +24,14 @@ def process_video(num_frames):
     if not num_frames or num_frames > frame_count:
         num_frames = frame_count
 
+    frame_files = [f for f in os.listdir(save_path) if f.startswith("frame_") and f.endswith(".jpg")]
+    existing_frame_numbers = [int(f.split("_")[1].split(".")[0]) for f in frame_files]
+
+    if existing_frame_numbers:
+        frame_counter = max(existing_frame_numbers) + 1
+    else:
+        frame_counter = 1
+
     selected_frames = random.sample(range(1, frame_count + 1), num_frames)
     selected_frames.sort()
 
@@ -32,8 +41,9 @@ def process_video(num_frames):
         if not ret:
             break
 
-        frame_name = save_path + "/frame_" + str(i) + ".jpg"
+        frame_name = save_path + "/frame_" + str(frame_counter) + ".jpg"
         cv2.imwrite(frame_name, frame)
+        frame_counter += 1
 
     cap.release()
     cv2.destroyAllWindows()
